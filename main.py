@@ -1,5 +1,9 @@
 '''
 assumptions:- no sudden bold text in middle of text
+TODo:
+1. handle : that are in the string
+    use of \: to make it work
+2. have the smaller data (mode) be inside lists
 '''
 import fitz
 import pymupdf
@@ -43,13 +47,19 @@ def findmean(extract_data):
 # use weighted mean to find the answer, for now 1.5:1, check later
 def insertdata(ans,data,pos):
     index=0
+    # iterate through the data and insert \ when : is there
+    # for i in ans:
+    #     temp=""
+    #     if i==':':
+    #         temp=ans
     if pos==0:
         ans+="{'"+data+"':"
     else :
-        size= len(ans)
+        size= len(data)
         x=0
-        for i in range(size-1,0,-1):
-            if i==':':
+        for i in range(size-1,1,-1):
+            prev=data[i-1]
+            if prev+data[i] != "\:":
                 ans+="},"
                 x+=1
             elif x>pos:
@@ -57,8 +67,12 @@ def insertdata(ans,data,pos):
             else :
                 continue
     return ans           
-
-
+def cleanofcolon(data):
+    size=len(data)
+    for i in range(1,size,2):
+        text= data[i]
+        text=text.replace(":","\:")
+    return data
 def stack(data):
     stack = [data[0]]
     # assuming the first text to be the title 
@@ -67,54 +81,38 @@ def stack(data):
     mode = statistics.mode(data)
     size= len(data)
     ans = "{'"+data[1]+ "':"
+    isStart = True
     for i in range(2,size,2):
+        text=data[i+1]
+        imp = data[i]
+        if ans[-1]!= ":":
+            ans+="' ]"
+            isStart= False
+        else :
+            None
         if i<=stack[top]:
-            stack.append(data[i])
+            stack.append(imp)
             top+=1
-            ans=insertdata(ans,data[i+1],0)
+            ans=insertdata(ans,text,0)
+        elif data[i]== mode:
+            if isStart:
+                ans+= "[ '"+text
+            else :
+                ans += ", "+ text
+            isStart= True
         else :
             x=0
             # not sure about the comparison
-            while stack[top]<= data[i] and top>0:
+            while stack[top]<= imp and top>0:
                 stack.pop()
                 top-=1
                 x+=1
             # now for the appendings part 
-            ans=insertdata(ans,data[i+1],x)
-                
+            ans=insertdata(ans,text,x)
+        # if ans[-1]==",":
+        #     if
             # pop and update the value of ans
     return ans
-        
-
-
-                        
-def detect_headings(extracted_data) :
-    # sort by using the values obtained from Counter(importance)
-    return 0
-
-
-
-    # find mode and max values
-def nestbyimp(data,small):
-    x=2
-    ans="{'"
-    for item in data[1:]:
-        prev = current
-        current=item
-        nex = data[i]
-
-        if current[x][1]> prev[x-1][1]:
-            return
-            # append or something
-
-
-        # elif current[x][1] == small:
-        #     # create a list and append 
-        #      return
-        # else current[x][1] :
-            
-        
-        #if import spacy
 
 def parsejson(data):
     return json.loads(data)
@@ -123,7 +121,7 @@ def parsejson(data):
 if __name__ ==  "__main__": 
     files =["phenol-liquid-cert-.pdf","hmm.pdf", "lorem.pdf"]
     data = extract_text_with_details(files[2])
-    mean = findmean(data)
+    mean = cleanofcolon(findmean(data))
     ans = stack(mean)
     print(ans)
     #print(mean[0][1][1])

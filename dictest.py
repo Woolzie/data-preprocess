@@ -1,3 +1,4 @@
 ans = "hiiiii"
-ans+="errr"
+ans+="errr:rrrr"
+print(ans.replace(":","\:"))
 print(ans)
