@@ -3,11 +3,11 @@ assumptions:- no sudden bold text in middle of text
 '''
 import fitz
 import pymupdf
-import spacy
 import re
 import statistics
 from collections import Counter
-nlp = spacy.load("en_core_web_sm")
+import numpy 
+import json
 
 def extract_text_with_details(file_path):
     doc = fitz.open(file_path)
@@ -22,7 +22,6 @@ def extract_text_with_details(file_path):
                             "text": span["text"],
                             "font_size": span["size"],
                             "font_weight": span["flags"],
-                            "page": page_num
                         })
     return extracted_data
 
@@ -42,7 +41,50 @@ def findmean(extract_data):
 
     return imp
 # use weighted mean to find the answer, for now 1.5:1, check later
+def insertdata(ans,data,pos):
+    index=0
+    if pos==0:
+        ans+="{'"+data+"':"
+    else :
+        size= len(ans)
+        x=0
+        for i in range(size-1,0,-1):
+            if i==':':
+                ans+="},"
+                x+=1
+            elif x>pos:
+                break;  
+            else :
+                continue
+    return ans           
 
+
+def stack(data):
+    stack = [data[0]]
+    # assuming the first text to be the title 
+    top=0
+    # find out the smallest data so it can be in list 
+    mode = statistics.mode(data)
+    size= len(data)
+    ans = "{'"+data[1]+ "':"
+    for i in range(2,size,2):
+        if i<=stack[top]:
+            stack.append(data[i])
+            top+=1
+            ans=insertdata(ans,data[i+1],0)
+        else :
+            x=0
+            # not sure about the comparison
+            while stack[top]<= data[i] and top>0:
+                stack.pop()
+                top-=1
+                x+=1
+            # now for the appendings part 
+            ans=insertdata(ans,data[i+1],x)
+                
+            # pop and update the value of ans
+    return ans
+        
 
 
                         
@@ -50,29 +92,17 @@ def detect_headings(extracted_data) :
     # sort by using the values obtained from Counter(importance)
     return 0
 
-# def nestbyimp(data):
-#     # considering the heading to be the first
-#     current_imp= data[0]["imp"]
-#     current_data =data[0]["text"]
-#     ans = {current_data:[{}]}
-
-#     for item in data[1:]:
-#      if item["imp"]<=current_imp:
-#        # move inside its values,
-#        return
 
 
     # find mode and max values
 def nestbyimp(data,small):
-    current = data[0]
-    ans =""
-    # if current[1]
-    i = 2
     x=2
+    ans="{'"
     for item in data[1:]:
         prev = current
         current=item
         nex = data[i]
+
         if current[x][1]> prev[x-1][1]:
             return
             # append or something
@@ -84,15 +114,18 @@ def nestbyimp(data,small):
         # else current[x][1] :
             
         
-        #if 
+        #if import spacy
 
+def parsejson(data):
+    return json.loads(data)
 
 # shouldnt i sort and see create the appropriate {{[]}}
 if __name__ ==  "__main__": 
     files =["phenol-liquid-cert-.pdf","hmm.pdf", "lorem.pdf"]
     data = extract_text_with_details(files[2])
     mean = findmean(data)
-    print(mean)
+    ans = stack(mean)
+    print(ans)
     #print(mean[0][1][1])
     # print("big value: "+ str(max(mean)))
     # mode = statistics.mode(mean)
