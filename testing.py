@@ -32,11 +32,11 @@ def extract_text_with_details(file_path):
 
 def findmean(extract_data):
     
-    importance =[]
+    imp =[]
     for item in extract_data:
         # size.append(item["font_size"])
         # weights.append(item["font_weight"])
-        importance.append(int(item["font_size"])*1.5 + item["font_weight"])
+        imp.append(int(item["font_size"])*1.5 + item["font_weight"])
     return importance
 # use weighted mean to find the answer, for now 2:1, check later
 
@@ -61,6 +61,7 @@ if __name__ == "__main__":
     data = extract_text_with_details(files[1])
     mean = findmean(data)
     testfunc(data,mean)
+
 
 '''
 conclusion:- 
