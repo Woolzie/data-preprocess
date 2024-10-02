@@ -27,15 +27,18 @@ def extract_text_with_details(file_path):
     return extracted_data
 
 def findmean(extract_data):
+    #{num:string}
     imp =[]
     x=0
     for item in extract_data:
         font_size = int(item["font_size"]) * 1.5
         font_weight = item["font_weight"]
         importance_value = font_size + font_weight
-        x+=1
-    # Append as a dictionary
-        imp.append({x:[item["text"],importance_value]})
+        imp.append(importance_value)
+        imp.append(item["text"])
+        # x+=2
+    # # Append as a dictionary
+    #     imp.append({x:[item["text"],importance_value]})
 
     return imp
 # use weighted mean to find the answer, for now 1.5:1, check later
@@ -60,9 +63,9 @@ def detect_headings(extracted_data) :
 
 
     # find mode and max values
-def nestbyimp(data):
+def nestbyimp(data,small):
     current = data[0]
-    ans={}
+    ans =""
     # if current[1]
     i = 2
     x=2
@@ -70,23 +73,32 @@ def nestbyimp(data):
         prev = current
         current=item
         nex = data[i]
-        if current[x][1]> 30:
-            print(current[x][0])
-        x+=1
-        #if 
+        if current[x][1]> prev[x-1][1]:
+            return
+            # append or something
+
+
+        # elif current[x][1] == small:
+        #     # create a list and append 
+        #      return
+        # else current[x][1] :
+            
         
+        #if 
+
+
 # shouldnt i sort and see create the appropriate {{[]}}
 if __name__ ==  "__main__": 
     files =["phenol-liquid-cert-.pdf","hmm.pdf", "lorem.pdf"]
     data = extract_text_with_details(files[2])
     mean = findmean(data)
-    #print(mean)
+    print(mean)
     #print(mean[0][1][1])
     # print("big value: "+ str(max(mean)))
     # mode = statistics.mode(mean)
    # print(mode)
     #print("count: "+ str(Counter(mean)))
-    nestbyimp(mean)
+    # nestbyimp(mean,small)
 ''' style:
 when testing dont use print within the function, return the data and have it print in the main 
 '''
