@@ -33,18 +33,19 @@ def extract_text_with_details(file_path):
 def findmean(extract_data):
     #{num:string}
     imp =[]
+    data =[]
     x=0
     for item in extract_data:
         font_size = int(item["font_size"]) * 1.5
         font_weight = item["font_weight"]
         importance_value = font_size + font_weight
         imp.append(importance_value)
-        imp.append(item["text"])
+        data.append(cleanofcolon(item["text"]))
         # x+=2
     # # Append as a dictionary
     #     imp.append({x:[item["text"],importance_value]})
 
-    return imp
+    return imp,data
 # use weighted mean to find the answer, for now 1.5:1, check later
 def insertdata(ans,data,count):
     index=0
@@ -69,28 +70,25 @@ def insertdata(ans,data,count):
     return ans           
 
 def cleanofcolon(data):
-    size=len(data)
-    for i in range(1,size,2):
-        text= data[i]
-        text=text.replace(":","\:")
-    return data
+    # i want it to give priority to the word prev to :
+    return data.replace(":","")
 
-def stack(data):
-    stack = [data[0]]
+def stack(impo,data):
+    stack = [impo[0]]
     # assuming the first text to be the title 
     top=0 
     mode = statistics.mode(data)
     size= len(data)
     ans = "{'"+data[1]+ "':"
     isStart = True
-    for i in range(2,size,2):
-        text=data[i+1]
-        imp = data[i]
-        if ans[-1]!= ":":
-            ans+="']"
-            isStart= False
-        else :
-            None
+    for i in range(0,size,1):
+        text=data[i]
+        imp = impo[i]
+        # if ans[-1]!= ":":
+        #     ans+="']"
+        #     isStart= False
+        # else :
+        #     None
 
         if imp == mode:
             if isStart:
@@ -113,6 +111,7 @@ def stack(data):
             ans=insertdata(ans,text,x)
     # case 1: when ans[-1]
     # how to close
+    ans+='}'
     return ans
 
 def parsejson(data):
@@ -120,10 +119,10 @@ def parsejson(data):
 
 if __name__ ==  "__main__": 
     files =["phenol-liquid-cert-.pdf","hmm.pdf", "lorem.pdf"]
-    data = extract_text_with_details(files[2])
-    mean = (findmean(data))
-    ans = stack(mean)
-    print(mean)
+    extract_data = extract_text_with_details(files[2])
+    imp, text= (findmean(extract_data))
+    ans = stack(imp,text)
+    print(ans)
 
 ''' style:
 when testing dont use print within the function, return the data and have it print in the main 
