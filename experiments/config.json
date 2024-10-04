@@ -1,0 +1,10 @@
+{
+    "Identification": {
+        "Product Name": "Product Name[:]\\s(.*)",
+        "Cat No.": "Cat No.[:]\\s(.*)",
+        "Synonyms": "Synonyms[:]\\s(.*)",
+        "Recommended Use": "Recommended Use[:]\\s(.*)",
+        "Uses advised against": "Uses advised against[:]\\s(.*)",
+        "Company": "Company[:]\\s(.*)"
+    }
+}

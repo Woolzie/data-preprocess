@@ -27,6 +27,7 @@ def extract_text_with_details(file_path):
                             "text": span["text"],
                             "font_size": span["size"],
                             "font_weight": span["flags"],
+                            "bbox": span["bbox"]
                         })
     return extracted_data
 
@@ -34,6 +35,7 @@ def findmean(extract_data):
     #{num:string}
     imp =[]
     data =[]
+    bbox=[]
     x=0
     for item in extract_data:
         font_size = int(item["font_size"]) * 1.5
@@ -41,11 +43,12 @@ def findmean(extract_data):
         importance_value = font_size + font_weight
         imp.append(importance_value)
         data.append(cleanofcolon(item["text"]))
+        bbox.append(item["bbox"])
         # x+=2
     # # Append as a dictionary
     #     imp.append({x:[item["text"],importance_value]})
 
-    return imp,data
+    return imp,data,bbox
 # use weighted mean to find the answer, for now 1.5:1, check later
 def insertdata(ans,data,count):
     index=0
@@ -89,7 +92,6 @@ def stack(impo,data):
         #     isStart= False
         # else :
         #     None
-
         if imp == mode:
             if isStart:
                 ans+= "['"+text
@@ -120,9 +122,9 @@ def parsejson(data):
 if __name__ ==  "__main__": 
     files =["phenol-liquid-cert-.pdf","hmm.pdf", "lorem.pdf"]
     extract_data = extract_text_with_details(files[2])
-    imp, text= (findmean(extract_data))
+    imp, text, bbox = (findmean(extract_data))
     ans = stack(imp,text)
-    print(ans)
+    print(bbox)
 
 ''' style:
 when testing dont use print within the function, return the data and have it print in the main 
